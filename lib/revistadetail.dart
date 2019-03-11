@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quincemagazine/home.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:html/dom.dart' as dom;
 
 class RevistaDetail extends StatelessWidget {
 
@@ -65,12 +64,6 @@ class RevistaDetail extends StatelessWidget {
         iconTheme: new IconThemeData(color: Colors.lightBlueAccent),
         backgroundColor: Colors.white,
         elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.chrome_reader_mode),
-            tooltip: 'Visualizar',
-          )
-        ],
       ),
       body: new Container(
         decoration: new BoxDecoration(
