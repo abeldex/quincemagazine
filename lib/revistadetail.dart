@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quincemagazine/home.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:ui' as ui;
 
 class RevistaDetail extends StatelessWidget {
@@ -15,13 +16,19 @@ class RevistaDetail extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          
           _buildAvatar(),
           _buildInfo(),
+          /*WebView(
+            initialUrl: 'https://flutter.io',
+          ),*/
           //_buildVideoScroller(),
         ],
+        
       ),
     );
   }
+
 
   Widget _buildAvatar() {
     return Container(
@@ -35,7 +42,9 @@ class RevistaDetail extends StatelessWidget {
       padding: const EdgeInsets.all(3.0),
       child: ClipOval(
         child: Image.network("http://revistaquince.000webhostapp.com/images/${rev.bookBgImg}"),
+        
       ),
+      
     );
   }
 
@@ -71,6 +80,18 @@ class RevistaDetail extends StatelessWidget {
                   defaultTextStyle: TextStyle( color: Colors.white.withOpacity(0.85),
               height: 1.4, fontSize: 16),
               ),
+          Card(
+            shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Container(
+                height: 350.0,
+                child: WebView(
+                    initialUrl: "${rev.bookFileUrl}",
+                    javaScriptMode: JavaScriptMode.unrestricted,
+                ),
+        ),
+          ),
         ],
       ),
     );
@@ -88,10 +109,13 @@ class RevistaDetail extends StatelessWidget {
             child: Container(
               color: Colors.black.withOpacity(0.5),
               child: _buildContent(),
+              
             ),
           ),
         ],
+        
       ),
+      
     );
   }
   /*bodyWidget(BuildContext context)=>Stack(

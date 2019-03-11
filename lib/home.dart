@@ -4,7 +4,7 @@ class Home {
   Home({this.eBOOKAPP});
 
   Home.fromJson(Map<String, dynamic> json) {
-    if (json['EBOOK_APP'] != null) {
+        if (json['EBOOK_APP'] != null) {
       eBOOKAPP = new List<EBOOKAPP>();
       json['EBOOK_APP'].forEach((v) {
         eBOOKAPP.add(new EBOOKAPP.fromJson(v));
@@ -30,6 +30,7 @@ class EBOOKAPP {
   String bookCoverImg;
   String bookBgImg;
   String bookFileType;
+  String bookFileUrl;
   String totalRate;
   String rateAvg;
   String bookViews;
@@ -40,20 +41,21 @@ class EBOOKAPP {
 
   EBOOKAPP(
       {this.id,
-        this.catId,
-        this.aid,
-        this.bookTitle,
-        this.bookDescription,
-        this.bookCoverImg,
-        this.bookBgImg,
-        this.bookFileType,
-        this.totalRate,
-        this.rateAvg,
-        this.bookViews,
-        this.authorId,
-        this.authorName,
-        this.cid,
-        this.categoryName});
+      this.catId,
+      this.aid,
+      this.bookTitle,
+      this.bookDescription,
+      this.bookCoverImg,
+      this.bookBgImg,
+      this.bookFileType,
+      this.bookFileUrl,
+      this.totalRate,
+      this.rateAvg,
+      this.bookViews,
+      this.authorId,
+      this.authorName,
+      this.cid,
+      this.categoryName});
 
   EBOOKAPP.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -64,6 +66,7 @@ class EBOOKAPP {
     bookCoverImg = json['book_cover_img'];
     bookBgImg = json['book_bg_img'];
     bookFileType = json['book_file_type'];
+    bookFileUrl = json['book_file_url'];
     totalRate = json['total_rate'];
     rateAvg = json['rate_avg'];
     bookViews = json['book_views'];
@@ -83,6 +86,7 @@ class EBOOKAPP {
     data['book_cover_img'] = this.bookCoverImg;
     data['book_bg_img'] = this.bookBgImg;
     data['book_file_type'] = this.bookFileType;
+    data['book_file_url'] = this.bookFileUrl;
     data['total_rate'] = this.totalRate;
     data['rate_avg'] = this.rateAvg;
     data['book_views'] = this.bookViews;
