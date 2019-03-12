@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-//importar la paqueteria para interactuar con KSON
 import 'package:quincemagazine/login_page.dart';
 import 'package:quincemagazine/member_page.dart';
-import 'globals.dart' as globals;
+import 'package:quincemagazine/ui/page/credit_card_page.dart';
+import 'package:quincemagazine/ui/page/payment_success_page.dart';
 
 /*void main() => runApp(MaterialApp(
   title: 'Quinceanera Magazine App',
@@ -29,6 +29,8 @@ class MyApp extends StatelessWidget {
       routes: <String,WidgetBuilder>{
         '/MemberPage': (BuildContext context)=> new QuinceMagazineHome(),
         '/LoginPage': (BuildContext context)=> new LoginPage(),
+        '/CreditcardPage': (BuildContext context)=> new CreditCardPage(),
+        '/PaymentSuccessPage': (BuildContext context)=> new PaymentSuccessPage(),
       }
     );
   }

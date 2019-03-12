@@ -11,14 +11,14 @@ class RevistaDetail extends StatelessWidget {
   //constructor para obtener la informacion de la revista seleccionada
   RevistaDetail({this.rev});
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           
           _buildAvatar(),
-          _buildInfo(),
+          _buildInfo(context),
           /*WebView(
             initialUrl: 'https://flutter.io',
           ),*/
@@ -48,7 +48,7 @@ class RevistaDetail extends StatelessWidget {
     );
   }
 
-  Widget _buildInfo() {
+  Widget _buildInfo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
       child: Column(
@@ -79,7 +79,7 @@ class RevistaDetail extends StatelessWidget {
                   data: rev.bookDescription,
                   defaultTextStyle: TextStyle( color: Colors.white.withOpacity(0.85),
               height: 1.4, fontSize: 16),
-              ),
+              ),            
           Card(
             shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
@@ -91,6 +91,23 @@ class RevistaDetail extends StatelessWidget {
                     javaScriptMode: JavaScriptMode.unrestricted,
                 ),
         ),
+          ),
+          MaterialButton(onPressed: () {
+            Navigator.pushReplacementNamed(context, '/CreditcardPage');
+          },
+           highlightColor: Colors.transparent,
+                    splashColor: Colors.pinkAccent,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 42.0),
+                      child: Text(
+                        "Subscribirse",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25.0,
+                            fontFamily: "Arial"),
+                      ),
+          )
           ),
         ],
       ),
@@ -108,7 +125,7 @@ class RevistaDetail extends StatelessWidget {
             filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Container(
               color: Colors.black.withOpacity(0.5),
-              child: _buildContent(),
+              child: _buildContent(context),
               
             ),
           ),
