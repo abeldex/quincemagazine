@@ -1,46 +1,27 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 import 'package:quincemagazine/home.dart';
-import 'package:quincemagazine/revistadetail.dart';
-import 'globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:quincemagazine/globals.dart' as globals;
 
 
-class QuinceMagazineHome extends StatefulWidget {
+class RevistasPage  extends StatefulWidget {
   @override
-  _QuinceMagazineHomeState createState() => _QuinceMagazineHomeState();
+  State<StatefulWidget> createState() => new _StampCollectionPageState();
+
 }
 
-class _QuinceMagazineHomeState extends State<QuinceMagazineHome> {
-  
-  _QuinceMagazineHomeState({this.username});
 
-  final String username;
-  var url = "http://revistaquince.000webhostapp.com/api.php?latest";
-
-  Home home;
-
-  @override
-  void initState() {
-    super.initState();
-    ObtenerDatos();
-    //print("Segunda tarea");
-  }
-
-  ObtenerDatos() async {
-    var res = await http.get(url);
-    //print(res.body);
-    var decodedJSON = jsonDecode(res.body);
-    home = Home.fromJson(decodedJSON);
-    //print(home.toJson());
-    setState(() {});
-  }
+class _StampCollectionPageState extends StampCollectionPageAbstractState<RevistasPage> {
 
   @override
   Widget build(BuildContext context) {
-    //return Container(color:Colors.deepPurple);
-    return Scaffold(
-        drawer: Drawer(
+
+    Matrix4 transform = new Matrix4.skewX(10.0);
+    transform.translate(-100.0);
+    return new Scaffold(
+      drawer: Drawer(
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
@@ -97,7 +78,10 @@ class _QuinceMagazineHomeState extends State<QuinceMagazineHome> {
                 title: Text('Revistas'),
                 trailing: Icon(Icons.arrow_right),
                 onTap: () {
-                  Navigator.pushReplacementNamed(context, '/RevistasPage');
+                  // Update the state of the app
+                  // ...
+                  // Then close the drawer
+                  Navigator.pop(context);
                 },
               ),
               ListTile(
@@ -144,58 +128,117 @@ class _QuinceMagazineHomeState extends State<QuinceMagazineHome> {
           iconTheme: new IconThemeData(color: Colors.lightBlueAccent),
           backgroundColor: Colors.white,
         ),
-        body: home == null ? Center(child: CircularProgressIndicator(),) :
-            new Container(
-           decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                    image: new ExactAssetImage('assets/images/librero.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                 child: CustomScrollView(
-                  primary: false,
-                  slivers: <Widget>[
-                    SliverPadding(
-                      padding: EdgeInsets.all(10.0),
-                      
-                      sliver: SliverGrid.count(
-                        childAspectRatio: 2 / 3,
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 12.0,
-                        crossAxisSpacing: 12.0,
-                        children: home.eBOOKAPP.map((book) => Hero(
-                            tag: book.bookTitle,
-                            
-                            child: Material(
-                              
-                              elevation: 10.0,
-                              shadowColor: Colors.pink.shade900,
-                              
-                              child: InkWell(
-                                
-                                onTap: () {
-                                  //Navigator.pushNamed(context, 'detail/${book.id}');
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RevistaDetail(
-                                      rev: book,
-                                  )));
-                                },
-                                child: Image(
-                                  image: NetworkImage("http://revistaquince.000webhostapp.com/images/${book.bookBgImg}"),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          )).toList(),
-                      ),
-                    )
-                  ],
-                ),     
-            ),
-        floatingActionButton: FloatingActionButton(onPressed: (){},
-          backgroundColor: Colors.lightBlueAccent,
-          child: Icon(Icons.refresh),
-        ),
+      body: new ListView.builder(itemBuilder: (BuildContext context, int index){
+        return new BookCardCompact(items[index], onClick: (){},);
+      },
+      itemCount: items.length,
+      ),
     );
   }
+
+
 }
 
+abstract class StampCollectionPageAbstractState<T extends StatefulWidget> extends State<T> {
+
+  var url = "http://revistaquince.000webhostapp.com/api.php?latest";
+
+  Home home;
+
+  List<EBOOKAPP> items = new List();
+  
+  @override
+  void initState() {
+    super.initState();
+    ObtenerDatos();
+    //print("Segunda tarea");
+  }
+
+  ObtenerDatos() async {
+    var res = await http.get(url);
+    var decodedJSON = jsonDecode(res.body);
+    home = Home.fromJson(decodedJSON);
+    //print(home.toJson());
+    setState(() {
+       items = home.eBOOKAPP;
+    });
+  }
+
+
+
+}
+
+class BookCardCompact extends StatelessWidget {
+
+
+  BookCardCompact(this.book, {@required this.onClick});
+
+  final EBOOKAPP book;
+
+  final VoidCallback onClick;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return new GestureDetector(
+      onTap : onClick,
+      child: new Container(
+        child: new Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: new Column(
+            children: <Widget>[
+              new Row(
+                children: <Widget>[
+                  new Hero(child: new Image.network("http://revistaquince.000webhostapp.com/images/${book.bookBgImg}", height: 150.0, width: 100.0,), tag: book.id,),
+                  new Expanded(
+                    child: new Padding(
+                      padding: const EdgeInsets.only(top : 8.0, left: 24.0),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          new Text(book.bookTitle, style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 20.0), overflow: TextOverflow.ellipsis, maxLines: 2,),
+                          new SizedBox(height: 4.0,),
+                          new Text(book.categoryName),
+                       //   new SizedBox(height: 8.0,),
+                      //    new Text(_short(book.subtitle, 30)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  new SizedBox(width: 16.0,)
+                ],
+              ),
+              new Divider(color: Colors.black38, indent: 128.0,),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+  String _short(String title, int targetLength) {
+    var list = title.split(" ");
+    int buffer = 0;
+    String result = "";
+    bool showedAll = true;
+    for(String item in list) {
+      if(buffer + item.length <= targetLength) {
+        buffer += item.length;
+        result += item += " ";
+      } else {
+        showedAll = false;
+        break;
+      }
+    }
+    //Handle case of one very long word
+    if(result == "" && title.length > 18) {
+      result = title.substring(0, 18);
+      showedAll = false;
+    }
+
+    if(!showedAll) result += "...";
+    return result;
+  }
+}

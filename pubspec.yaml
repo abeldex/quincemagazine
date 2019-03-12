@@ -30,6 +30,12 @@ dependencies:
   flutter_launcher_icons: "^0.7.0"
   webview_flutter: ^0.1.1
   date_format: ^1.0.6
+  rflutter_alert: ^1.0.2
+  url_launcher: ^4.0.1
+  shared_preferences: ^0.4.3
+  rxdart: ^0.19.0
+  flutter_full_pdf_viewer: ^1.0.4
+  path_provider: ^0.4.1
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +62,8 @@ flutter:
     - assets/images/login_bg.png
     - assets/images/QuinceLogo.png
     - assets/images/map.png
+    - assets/images/librero.jpg
+
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 

@@ -1,46 +1,48 @@
+
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:quincemagazine/home.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:quincemagazine/globals.dart' as globals;
 import 'package:quincemagazine/revistadetail.dart';
-import 'globals.dart' as globals;
 
 
-class QuinceMagazineHome extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _QuinceMagazineHomeState createState() => _QuinceMagazineHomeState();
+  _HomePage createState() => _HomePage();  
 }
 
-class _QuinceMagazineHomeState extends State<QuinceMagazineHome> {
+class _HomePage extends State<HomePage> {
   
-  _QuinceMagazineHomeState({this.username});
-
-  final String username;
+  
   var url = "http://revistaquince.000webhostapp.com/api.php?latest";
 
   Home home;
+  List<EBOOKAPP> book;
 
   @override
   void initState() {
     super.initState();
-    ObtenerDatos();
+    obtenerDatos();
     //print("Segunda tarea");
   }
 
-  ObtenerDatos() async {
+  obtenerDatos() async {
     var res = await http.get(url);
     //print(res.body);
     var decodedJSON = jsonDecode(res.body);
     home = Home.fromJson(decodedJSON);
     //print(home.toJson());
-    setState(() {});
+    setState(() {
+      book = home.eBOOKAPP.toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    //return Container(color:Colors.deepPurple);
-    return Scaffold(
-        drawer: Drawer(
+    
+    //drawe
+    final lefdrawer = Drawer(
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
@@ -137,65 +139,68 @@ class _QuinceMagazineHomeState extends State<QuinceMagazineHome> {
               ),
             ],
           ),
-        ),
-        appBar: AppBar(
+        );
+
+    //app bar
+    final appBar =AppBar(
           //Establecer el logo de la aplicacion
           title: Image.asset("assets/images/QuinceLogo.png", width: 280,),
           iconTheme: new IconThemeData(color: Colors.lightBlueAccent),
           backgroundColor: Colors.white,
-        ),
-        body: home == null ? Center(child: CircularProgressIndicator(),) :
-            new Container(
-           decoration: new BoxDecoration(
+        );
+
+    createTile(book) => Hero(
+          tag: book.bookTitle,
+          
+          child: Material(
+            elevation: 10.0,
+            shadowColor: Colors.pink.shade900,
+            
+            child: InkWell(
+              onTap: () {
+                //Navigator.pushNamed(context, 'detail/${book.id}');
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>RevistaDetail(
+                    rev: book,
+                )));
+              },
+              child: Image(
+                image: NetworkImage("http://revistaquince.000webhostapp.com/images/${book.bookBgImg}"),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
+
+    ///create book grid tiles
+    final grid = CustomScrollView(
+      primary: false,
+      slivers: <Widget>[
+        SliverPadding(
+          padding: EdgeInsets.all(16.0),
+          sliver: SliverGrid.count(
+            childAspectRatio: 2 / 3,
+            crossAxisCount: 3,
+            mainAxisSpacing: 50.0,
+            crossAxisSpacing: 50.0,
+            children: home.eBOOKAPP.map((book) => createTile(book)).toList(),
+          ),
+        )
+      ],
+    );
+
+    return Scaffold(
+      drawer: lefdrawer,
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: appBar,
+      
+      body: Container(
+        decoration: new BoxDecoration(
                   image: new DecorationImage(
                     image: new ExactAssetImage('assets/images/librero.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
-                 child: CustomScrollView(
-                  primary: false,
-                  slivers: <Widget>[
-                    SliverPadding(
-                      padding: EdgeInsets.all(10.0),
-                      
-                      sliver: SliverGrid.count(
-                        childAspectRatio: 2 / 3,
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 12.0,
-                        crossAxisSpacing: 12.0,
-                        children: home.eBOOKAPP.map((book) => Hero(
-                            tag: book.bookTitle,
-                            
-                            child: Material(
-                              
-                              elevation: 10.0,
-                              shadowColor: Colors.pink.shade900,
-                              
-                              child: InkWell(
-                                
-                                onTap: () {
-                                  //Navigator.pushNamed(context, 'detail/${book.id}');
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RevistaDetail(
-                                      rev: book,
-                                  )));
-                                },
-                                child: Image(
-                                  image: NetworkImage("http://revistaquince.000webhostapp.com/images/${book.bookBgImg}"),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          )).toList(),
-                      ),
-                    )
-                  ],
-                ),     
-            ),
-        floatingActionButton: FloatingActionButton(onPressed: (){},
-          backgroundColor: Colors.lightBlueAccent,
-          child: Icon(Icons.refresh),
-        ),
+        child: home == null ? Center(child: CircularProgressIndicator(),) : grid),
     );
   }
 }
-
