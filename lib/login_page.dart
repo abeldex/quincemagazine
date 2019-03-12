@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   print(e[0].success);*/
   if(datauser.length==0){
     setState(() {
-          msg="No pudimos conectarnos al servidor";
+          msg="No se pudo conectar al servidor";
           print(msg);
         });
   }else{
