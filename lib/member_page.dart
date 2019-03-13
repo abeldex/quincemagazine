@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:quincemagazine/home.dart';
 import 'package:quincemagazine/revistadetail.dart';
+import 'package:quincemagazine/revistadetail2.dart';
 import 'globals.dart' as globals;
 
 

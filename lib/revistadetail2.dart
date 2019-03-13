@@ -1,59 +1,64 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:quincemagazine/home.dart';
+import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
 import 'package:flutter_html/flutter_html.dart';
-//import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_pdf_renderer/flutter_pdf_renderer.dart';
+import 'dart:async';
 import 'dart:ui' as ui;
-import 'package:flutter_full_pdf_viewer/flutter_full_pdf_viewer.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:quincemagazine/home.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
-class RevistaDetail extends StatefulWidget  {
+class RevistaDetail2 extends StatefulWidget  {
   final EBOOKAPP rev;
-   RevistaDetail({this.rev});
+   RevistaDetail2({this.rev});
 @override
-  _RevistaDetail createState() => new _RevistaDetail( rev: rev);
+  _RevistaDetail2 createState() => new _RevistaDetail2( rev: rev);
  
 }
 
-class _RevistaDetail extends State<RevistaDetail> {
+class _RevistaDetail2 extends State<RevistaDetail2> {
   final EBOOKAPP rev;
 
   //constructor para obtener la informacion de la revista seleccionada
-  _RevistaDetail({this.rev});
-
-   String pathPDF = "";
+  _RevistaDetail2({this.rev});
   bool downloading = false;
-    
-      @override
-      void initState() {
-        super.initState();
-        bajarArchivo().then((f) {
-          setState(() {
-            pathPDF = f.path;
-            print(pathPDF);
-            //Navigator.pop(context);
-            //Navigator.push(context,MaterialPageRoute(builder: (context) => PDFScreen(pathPDF, rev.bookTitle)),);
-          });
-        });
-    }
+  var progressString = "";
+   String pathPDF = "";
+  @override
+  void initState() {
+    super.initState();
+    downloadFile();
+  }
 
-   Future<File> bajarArchivo() async {
-    final url = "${rev.bookFileUrl}";
-    final filename = url.substring(url.lastIndexOf("/") + 1);
-    var request = await HttpClient().getUrl(Uri.parse(url));
-    var response = await request.close();
-    var bytes = await consolidateHttpClientResponseBytes(response);
-    String dir = (await getApplicationDocumentsDirectory()).path;
-        File file = new File('$dir/$filename');
-        await file.writeAsBytes(bytes); 
-        downloading = true;          
-        return file;
-       
+  Future<void> downloadFile() async {
+    Dio dio = Dio();
+    try {
+      var dir = await getApplicationDocumentsDirectory();
+      final url = "${rev.bookFileUrl}";
+      final filename = url.substring(url.lastIndexOf("/") + 1);
+      pathPDF = "${dir.path}/${filename}";
+      await dio.download(url, "${dir.path}/${filename}",
+        onReceiveProgress: (rec, total) {
+        print("Rec: $rec , Total: $total");
+        //print(total);
+        setState(() {
+          downloading = true;
+          progressString = ((rec / total) * 100).toStringAsFixed(0) + "%";
+          
+        });
+      });
+    } catch (e) {
+      print(e);
     }
-    
-      Widget _buildContent(BuildContext context) {
+    setState(() {
+      downloading = false;
+      progressString = "Completed";
+    });
+    print("Download completed");
+}
+
+Widget _buildContent(BuildContext context) {
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,18 +128,42 @@ class _RevistaDetail extends State<RevistaDetail> {
                       defaultTextStyle: TextStyle( color: Colors.white.withOpacity(0.85),
                   height: 1.4, fontSize: 16),
                   ),             
-              /*Card(
+              Card(
                 shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Container(
                     height: 350.0,
-                    child: WebView(
+                    child: downloading
+            ? Container(
+                height: 120.0,
+                width: 200.0,
+                child: Card(
+                  color: Colors.black,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      CircularProgressIndicator(),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        "Cargando Revista: $progressString",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              )
+: PdfRenderer(pdfFile: pathPDF, width: 500.0),
+                    /*child: WebView(
                         initialUrl: "${rev.bookFileUrl}",
                         javaScriptMode: JavaScriptMode.unrestricted,
-                    ),
+                    ),*/
             ),
-              ),*/
+              ),
                //_buildBottomNavigationBar(context),
               /*MaterialButton(onPressed: () {
                
@@ -172,7 +201,7 @@ class _RevistaDetail extends State<RevistaDetail> {
               fit: FlexFit.tight,
               flex: 1,
               child: RaisedButton(
-                onPressed: ()  => downloading !=true ?   Alert(
+                onPressed: ()  => pathPDF == "" ?   Alert(
                       context: context,
                       //type: AlertType.info,
                       title: "Descargando demo...",
